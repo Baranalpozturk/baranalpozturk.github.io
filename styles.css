@@ -3,11 +3,10 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  /* height: 100%;
-  overflow: hidden; */
+  /* Eğer tam sayfa scroll istiyorsanız: */
   min-height: 100vh;
-  overflow-x: hidden; /* yatay kaydırma kapalı */
-  overflow-y: auto;   /* dikey kaydırma açık */
+  overflow-x: hidden; 
+  overflow-y: auto;
 }
 
 body {
@@ -27,11 +26,11 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   z-index: -1;
 }
 
-/* Dinamik arka plan (body::after) */
+/* Arka plan animasyonu (body::after) */
 body::after {
   content: "";
   position: fixed;
@@ -48,21 +47,11 @@ body::after {
 }
 
 @keyframes bgTransition {
-  0% {
-    background-image: url('https://picsum.photos/seed/pic1/1920/1080');
-  }
-  25% {
-    background-image: url('https://picsum.photos/seed/pic2/1920/1080');
-  }
-  50% {
-    background-image: url('https://picsum.photos/seed/pic3/1920/1080');
-  }
-  75% {
-    background-image: url('https://picsum.photos/seed/pic4/1920/1080');
-  }
-  100% {
-    background-image: url('https://picsum.photos/seed/pic5/1920/1080');
-  }
+  0% { background-image: url('https://picsum.photos/seed/pic1/1920/1080'); }
+  25% { background-image: url('https://picsum.photos/seed/pic2/1920/1080'); }
+  50% { background-image: url('https://picsum.photos/seed/pic3/1920/1080'); }
+  75% { background-image: url('https://picsum.photos/seed/pic4/1920/1080'); }
+  100% { background-image: url('https://picsum.photos/seed/pic5/1920/1080'); }
 }
 
 .container {
@@ -94,7 +83,7 @@ h2 {
   font-size: 1.4rem;
 }
 
-/* Görsel geçiş animasyonu ve bölümler */
+/* Section görünür/gizli */
 .section {
   transition: opacity 0.5s ease, transform 0.5s ease;
   opacity: 0;
@@ -107,7 +96,7 @@ h2 {
   transform: translateY(0);
 }
 
-/* Auth Form */
+/* Auth Forms */
 .auth-forms {
   display: flex;
   justify-content: space-around;
@@ -129,7 +118,7 @@ h2 {
   width: 90%;
 }
 
-/* Data form, profil ve reset inputları */
+/* Data form, profil, reset inputları */
 .data-form,
 .filter-container,
 #profile-section {
@@ -146,7 +135,6 @@ h2 {
   width: 90%;
 }
 
-/* Filtreler */
 .filter-container {
   display: flex;
   gap: 0.5rem;
@@ -155,7 +143,6 @@ h2 {
   flex-wrap: wrap;
 }
 
-/* Data listesi */
 .data-list {
   margin: 1rem 0;
   text-align: left;
@@ -240,7 +227,7 @@ h2 {
   background: rgba(255,255,255,0.2);
 }
 
-/* Şifre unuttum linki */
+/* Şifremi Unuttum linki */
 .forgot-pw {
   margin-top: 0.5rem;
   font-size: 0.9rem;
@@ -275,7 +262,6 @@ h2 {
   background: rgba(255,255,255,0.2);
 }
 
-/* Admin tab content */
 .admin-tab-content {
   display: none;
 }
@@ -287,7 +273,6 @@ h2 {
   text-align: left;
 }
 
-/* Kullanıcı listesi */
 #user-list {
   max-height: 200px;
   overflow-y: auto;
