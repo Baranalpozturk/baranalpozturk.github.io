@@ -3,6 +3,7 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  /* Eğer tam sayfa scroll istiyorsanız: */
   min-height: 100vh;
   overflow-x: hidden; 
   overflow-y: auto;
@@ -298,9 +299,10 @@ h2 {
   background: #4548c9;
 }
 
-/* Word Analysis bölümü ek stil */
+/* Pasta grafikleri (Word Analysis) */
 .analysis-charts {
   margin-top: 1rem;
+  text-align: center;
 }
 .analysis-charts canvas {
   margin: 1rem auto;
