@@ -1,18 +1,18 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Veri Analiz Uygulaması</title>
+  <title>Firebase Admin Role Management</title>
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Chart.js (grafikler icin) -->
+  <!-- Chart.js (grafikler için) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="overlay"></div>
   <div class="container">
-    <h1 id="app-title">Veri Analiz Uygulaması</h1>
+    <h1 id="app-title"></h1>
     <div class="lang-select">
       <select id="language-selector">
         <option value="en">English</option>
@@ -30,62 +30,65 @@
 
     <!-- Authentication Section -->
     <div id="auth-section" class="section visible">
-      <h2 id="auth-title">Kimlik Doğrulama</h2>
+      <h2 id="auth-title"></h2>
       <div class="auth-forms">
+        
         <!-- Register Form -->
         <div class="auth-form" id="register-form">
-          <h3 id="register-title">Kayıt Ol</h3>
+          <h3 id="register-title"></h3>
           <input id="register-email" type="email" placeholder="Email" required />
           <input id="register-password" type="password" placeholder="Password" required />
-          <button id="register-btn" class="btn">Kayıt Ol</button>
+          <button id="register-btn" class="btn"></button>
           <p class="info-msg" id="register-info"></p>
         </div>
+        
         <!-- Login Form -->
         <div class="auth-form" id="login-form">
-          <h3 id="login-title">Giriş Yap</h3>
+          <h3 id="login-title"></h3>
           <input id="login-email" type="email" placeholder="Email" required />
           <input id="login-password" type="password" placeholder="Password" required />
-          <button id="login-btn" class="btn">Giriş</button>
+          <button id="login-btn" class="btn"></button>
           <p class="info-msg" id="login-info"></p>
-          <p class="forgot-pw"><a href="#" id="forgot-pw-link">Şifremi Unuttum</a></p>
+          <p class="forgot-pw"><a href="#" id="forgot-pw-link"></a></p>
         </div>
+        
       </div>
     </div>
 
     <!-- Password Reset Section -->
     <div id="reset-section" class="section hidden">
-      <h2 id="reset-title">Şifre Sıfırla</h2>
+      <h2 id="reset-title"></h2>
       <input id="reset-email" type="email" placeholder="Email" required />
-      <button id="reset-btn" class="btn">Sıfırla</button>
+      <button id="reset-btn" class="btn"></button>
       <p class="info-msg" id="reset-info"></p>
     </div>
 
     <!-- Email Verification Info Section -->
     <div id="verify-section" class="section hidden">
-      <h2 id="verify-title">E-posta Doğrulaması Gerekli</h2>
-      <p id="verify-info">Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın. Gelen kutunuzu kontrol edin.</p>
-      <button id="resend-verification-btn" class="btn">Doğrulama E-postası Gönder</button>
+      <h2 id="verify-title"></h2>
+      <p id="verify-info"></p>
+      <button id="resend-verification-btn" class="btn"></button>
       <p class="info-msg" id="resend-info"></p>
     </div>
 
     <!-- Data Management Section -->
     <div id="data-section" class="section hidden">
-      <h2 id="data-title">Veri Yönetimi</h2>
+      <h2 id="data-title"></h2>
       <form id="data-form" class="data-form">
         <input type="text" id="name" placeholder="Name" required />
         <input type="text" id="message" placeholder="Message" required />
-        <button type="submit" class="btn" id="data-add-btn">Veri Ekle</button>
+        <button type="submit" class="btn" id="data-add-btn"></button>
       </form>
 
       <div class="filter-container">
         <input type="text" id="search-input" placeholder="Search..." />
         <select id="sort-select">
-          <option value="newest">En Yeniler</option>
-          <option value="oldest">En Eskiler</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
           <option value="az">A-Z</option>
           <option value="za">Z-A</option>
         </select>
-        <button id="apply-filters-btn" class="btn">Filtreleri Uygula</button>
+        <button id="apply-filters-btn" class="btn"></button>
       </div>
 
       <div id="data-list" class="data-list"></div>
@@ -94,35 +97,35 @@
 
     <!-- Profile Section -->
     <div id="profile-section" class="section hidden">
-      <h2 id="profile-title">Profil Ayarları</h2>
-      <input type="text" id="profile-name" placeholder="Ad Soyad" />
-      <input type="text" id="profile-photo" placeholder="Foto URL" />
-      <button id="profile-save-btn" class="btn">Kaydet</button>
+      <h2 id="profile-title"></h2>
+      <input type="text" id="profile-name" placeholder="Full Name" />
+      <input type="text" id="profile-photo" placeholder="Photo URL" />
+      <button id="profile-save-btn" class="btn"></button>
       <p class="info-msg" id="profile-info"></p>
     </div>
 
     <!-- Admin Section -->
     <div id="admin-section" class="section hidden">
-      <h2 id="admin-title">Admin Paneli</h2>
+      <h2 id="admin-title"></h2>
+
       <div class="admin-tabs">
-        <button class="admin-tab-btn" data-tab="user-management" id="admin-users-tab">Kullanıcı Yönetimi</button>
-        <button class="admin-tab-btn" data-tab="stats" id="admin-stats-tab">İstatistikler</button>
+        <button class="admin-tab-btn" data-tab="user-management" id="admin-users-tab"></button>
+        <button class="admin-tab-btn" data-tab="stats" id="admin-stats-tab"></button>
       </div>
 
       <div id="admin-content">
         <!-- User Management -->
         <div id="user-management" class="admin-tab-content hidden">
-          <h3 id="user-management-title">Kullanıcılar</h3>
+          <h3 id="user-management-title"></h3>
           <div id="user-list"></div>
           <p class="info-msg" id="user-info"></p>
         </div>
 
         <!-- Stats & Charts -->
         <div id="stats" class="admin-tab-content hidden">
-          <h3 id="stats-title">Grafikler</h3>
+          <h3 id="stats-title"></h3>
           <canvas id="userChart" width="300" height="200"></canvas>
           <canvas id="messageChart" width="300" height="200"></canvas>
-          <canvas id="pieChart" width="300" height="200"></canvas>
         </div>
       </div>
     </div>
