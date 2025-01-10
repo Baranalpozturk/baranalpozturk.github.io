@@ -19,10 +19,9 @@ import {
   update
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 
-// == Firebase Config ==
+// == Firebase Config (baranalp-6ebb3) ==
 const firebaseConfig = {
-  // Burayı kendi Firebase projenizin config bilgileriyle güncelleyin
-  apiKey: "AIzaSyB5vAeN2_...",
+  apiKey: "AIzaSyB5vAeN2_RpXftWn69gDFUCdytSoEYFkAY",
   authDomain: "baranalp-6ebb3.firebaseapp.com",
   databaseURL: "https://baranalp-6ebb3-default-rtdb.firebaseio.com",
   projectId: "baranalp-6ebb3",
@@ -45,6 +44,8 @@ const adminSection = document.getElementById("admin-section");
 const resetSection = document.getElementById("reset-section");
 const verifySection = document.getElementById("verify-section");
 
+const registerForm = document.getElementById("register-form");
+const loginForm = document.getElementById("login-form");
 const registerBtn = document.getElementById("register-btn");
 const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
@@ -77,7 +78,6 @@ const profilePhotoInput = document.getElementById("profile-photo");
 const profileSaveBtn = document.getElementById("profile-save-btn");
 
 const navBar = document.getElementById("nav-bar");
-
 const adminUserTabBtn = document.getElementById("admin-users-tab");
 const adminStatsTabBtn = document.getElementById("admin-stats-tab");
 const userManagementDiv = document.getElementById("user-management");
@@ -419,12 +419,12 @@ registerBtn.addEventListener("click", () => {
 
       get(adminRef).then((snapshot) => {
         if (!snapshot.exists()) {
-          // İlk üye admin olsun
+          // Eğer admin node'u yoksa, ilk kullanıcı admin olsun
           set(ref(database, `users/${userId}`), { email, admin: true });
           set(adminRef, userId);
           registerInfo.textContent = "Registration successful! First user set as admin.";
         } else {
-          // Diğer üyeler normal
+          // Aksi halde normal kullanıcı
           set(ref(database, `users/${userId}`), { email, admin: false });
           registerInfo.textContent = "Registration successful! You are a normal user.";
         }
@@ -468,6 +468,8 @@ logoutBtn.addEventListener("click", () => {
     setupNav(false);
     clearMessages();
     showSection(authSection);
+    // Kullanıcı çıkınca register formu tekrar görünür olsun
+    registerForm.style.display = "flex";
   });
 });
 
@@ -576,6 +578,9 @@ dataForm.addEventListener("submit", (e) => {
 onAuthStateChanged(auth, (user) => {
   clearMessages();
   if (user) {
+    // Kullanıcı girişi varsa register formunu gizle
+    registerForm.style.display = "none";
+
     if (!user.emailVerified) {
       showSection(verifySection);
       return;
@@ -601,6 +606,8 @@ onAuthStateChanged(auth, (user) => {
       }
     });
   } else {
+    // Kullanıcı yoksa register formu görünür
+    registerForm.style.display = "flex";
     currentUserId = null;
     isAdmin = false;
     showAdminFeatures(false);
