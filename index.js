@@ -243,7 +243,6 @@ function renderData() {
   }
 
   let filtered = [...allMessages];
-
   const searchTerm = searchInput.value.toLowerCase();
   if (searchTerm) {
     filtered = filtered.filter(m =>
@@ -420,12 +419,12 @@ registerBtn.addEventListener("click", () => {
 
       get(adminRef).then((snapshot) => {
         if (!snapshot.exists()) {
-          // Eğer admin node'u yoksa, bu ilk kayıt olan kullanıcıyı admin yapalım
+          // İlk üye admin olsun
           set(ref(database, `users/${userId}`), { email, admin: true });
           set(adminRef, userId);
           registerInfo.textContent = "Registration successful! First user set as admin.";
         } else {
-          // admin node'u zaten varsa, kayıt olan kullanıcı normal user olsun
+          // Devam edenler normal kullanıcı
           set(ref(database, `users/${userId}`), { email, admin: false });
           registerInfo.textContent = "Registration successful! You are a normal user.";
         }
@@ -594,7 +593,6 @@ onAuthStateChanged(auth, (user) => {
           loadAllUsers();
         }
       } else {
-        // Kullanıcı datası yoksa da dataSection'a geçebilir
         isAdmin = false;
         showAdminFeatures(false);
         setupNav(true);
@@ -603,7 +601,6 @@ onAuthStateChanged(auth, (user) => {
       }
     });
   } else {
-    // Kullanıcı çıkış yapmış ya da hiç giriş yapmamış
     currentUserId = null;
     isAdmin = false;
     showAdminFeatures(false);
