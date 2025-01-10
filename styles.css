@@ -1,9 +1,13 @@
+/* KÖK ELEMENTLER */
 html, body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  height: 100%;
-  overflow: hidden;
+  /* height: 100%;
+  overflow: hidden; */
+  min-height: 100vh;
+  overflow-x: hidden; /* yatay kaydırma kapalı */
+  overflow-y: auto;   /* dikey kaydırma açık */
 }
 
 body {
@@ -27,6 +31,7 @@ body {
   z-index: -1;
 }
 
+/* Dinamik arka plan (body::after) */
 body::after {
   content: "";
   position: fixed;
@@ -89,19 +94,20 @@ h2 {
   font-size: 1.4rem;
 }
 
+/* Görsel geçiş animasyonu ve bölümler */
 .section {
   transition: opacity 0.5s ease, transform 0.5s ease;
   opacity: 0;
   transform: translateY(20px);
   display: none;
 }
-
 .section.visible {
   display: block;
   opacity: 1;
   transform: translateY(0);
 }
 
+/* Auth Form */
 .auth-forms {
   display: flex;
   justify-content: space-around;
@@ -123,11 +129,16 @@ h2 {
   width: 90%;
 }
 
-.data-form, .filter-container, #profile-section {
+/* Data form, profil ve reset inputları */
+.data-form,
+.filter-container,
+#profile-section {
   margin-bottom: 1rem;
 }
 
-.data-form input, #profile-section input, #reset-section input {
+.data-form input,
+#profile-section input,
+#reset-section input {
   margin: 0.5rem 0;
   padding: 0.5rem;
   border: none;
@@ -135,6 +146,7 @@ h2 {
   width: 90%;
 }
 
+/* Filtreler */
 .filter-container {
   display: flex;
   gap: 0.5rem;
@@ -143,13 +155,13 @@ h2 {
   flex-wrap: wrap;
 }
 
+/* Data listesi */
 .data-list {
   margin: 1rem 0;
   text-align: left;
   max-height: 200px;
   overflow-y: auto;
 }
-
 .data-list .data-item {
   background: rgba(255,255,255,0.1);
   margin: 0.5rem 0;
@@ -159,11 +171,9 @@ h2 {
   justify-content: space-between;
   align-items: center;
 }
-
 .data-list .data-item span {
   word-break: break-all;
 }
-
 .data-list .data-item button.delete-btn {
   background: #f25454;
   border: none;
@@ -173,11 +183,11 @@ h2 {
   padding: 0.4rem 0.6rem;
   font-size: 0.8rem;
 }
-
 .data-list .data-item button.delete-btn:hover {
   background: #c94343;
 }
 
+/* Genel butonlar */
 .btn {
   margin-top: 0.5rem;
   padding: 0.6rem 1rem;
@@ -189,20 +199,20 @@ h2 {
   font-weight: bold;
   color: #fff;
 }
-
 .btn:hover {
   background: #4548c9;
 }
 
+/* Logout butonu (kırmızı) */
 .logout-btn {
   margin-top: 1.5rem;
   background: #f25454;
 }
-
 .logout-btn:hover {
   background: #c94343;
 }
 
+/* Bilgi mesajları */
 .info-msg {
   min-height: 20px;
   margin-top: 0.5rem;
@@ -210,13 +220,13 @@ h2 {
   color: #ffdf5d;
 }
 
+/* Navigasyon */
 .nav {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
   justify-content: center;
 }
-
 .nav-btn {
   background: rgba(255,255,255,0.1);
   border: none;
@@ -226,36 +236,33 @@ h2 {
   cursor: pointer;
   white-space: nowrap;
 }
-
 .nav-btn:hover {
   background: rgba(255,255,255,0.2);
 }
 
+/* Şifre unuttum linki */
 .forgot-pw {
   margin-top: 0.5rem;
   font-size: 0.9rem;
 }
-
 .forgot-pw a {
   color: #ffdf5d;
   text-decoration: none;
 }
-
 .forgot-pw a:hover {
   text-decoration: underline;
 }
 
+/* Admin öğeleri */
 .admin-only {
   display: none;
 }
-
 .admin-tabs {
   display: flex;
   gap: 1rem;
   justify-content: center;
   margin-bottom: 1rem;
 }
-
 .admin-tab-btn {
   background: rgba(255,255,255,0.1);
   border: none;
@@ -264,30 +271,28 @@ h2 {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .admin-tab-btn:hover {
   background: rgba(255,255,255,0.2);
 }
 
+/* Admin tab content */
 .admin-tab-content {
   display: none;
 }
-
 .admin-tab-content.hidden {
   display: none;
 }
-
 .admin-tab-content.visible {
   display: block;
   text-align: left;
 }
 
+/* Kullanıcı listesi */
 #user-list {
   max-height: 200px;
   overflow-y: auto;
   margin: 1rem 0;
 }
-
 #user-list .user-item {
   background: rgba(255,255,255,0.1);
   margin: 0.5rem 0;
@@ -297,7 +302,6 @@ h2 {
   justify-content: space-between;
   align-items: center;
 }
-
 #user-list .user-item button {
   background: #5564f2;
   border: none;
@@ -306,11 +310,11 @@ h2 {
   color: #fff;
   cursor: pointer;
 }
-
 #user-list .user-item button:hover {
   background: #4548c9;
 }
 
+/* Mobil uyum */
 @media (max-width: 600px) {
   .container {
     max-width: 90%;
