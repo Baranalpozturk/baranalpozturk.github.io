@@ -1,318 +1,132 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  height: 100%;
-  overflow: hidden;
-}
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Firebase Admin Role Management</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Chart.js (grafikler için) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1 id="app-title"></h1>
+    <div class="lang-select">
+      <select id="language-selector">
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+      </select>
+    </div>
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #000;
-  position: relative;
-  color: #fff;
-  text-align: center;
-}
+    <!-- Navigation -->
+    <nav class="nav hidden" id="nav-bar">
+      <button class="nav-btn" data-section="data-section" id="nav-data"></button>
+      <button class="nav-btn" data-section="profile-section" id="nav-profile"></button>
+      <button class="nav-btn admin-only" data-section="admin-section" id="nav-admin"></button>
+      <button id="logout-btn" class="btn logout-btn"></button>
+    </nav>
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: -1;
-}
+    <!-- Authentication Section -->
+    <div id="auth-section" class="section visible">
+      <h2 id="auth-title"></h2>
+      <div class="auth-forms">
+        <div class="auth-form">
+          <h3 id="register-title"></h3>
+          <input id="register-email" type="email" placeholder="Email" required />
+          <input id="register-password" type="password" placeholder="Password" required />
+          <button id="register-btn" class="btn"></button>
+          <p class="info-msg" id="register-info"></p>
+        </div>
+        
+        <div class="auth-form">
+          <h3 id="login-title"></h3>
+          <input id="login-email" type="email" placeholder="Email" required />
+          <input id="login-password" type="password" placeholder="Password" required />
+          <button id="login-btn" class="btn"></button>
+          <p class="info-msg" id="login-info"></p>
+          <p class="forgot-pw"><a href="#" id="forgot-pw-link"></a></p>
+        </div>
+      </div>
+    </div>
 
-body::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  animation: bgTransition 20s infinite;
-  filter: blur(2px);
-}
+    <!-- Password Reset Section -->
+    <div id="reset-section" class="section hidden">
+      <h2 id="reset-title"></h2>
+      <input id="reset-email" type="email" placeholder="Email" required />
+      <button id="reset-btn" class="btn"></button>
+      <p class="info-msg" id="reset-info"></p>
+    </div>
 
-@keyframes bgTransition {
-  0% {
-    background-image: url('https://picsum.photos/seed/pic1/1920/1080');
-  }
-  25% {
-    background-image: url('https://picsum.photos/seed/pic2/1920/1080');
-  }
-  50% {
-    background-image: url('https://picsum.photos/seed/pic3/1920/1080');
-  }
-  75% {
-    background-image: url('https://picsum.photos/seed/pic4/1920/1080');
-  }
-  100% {
-    background-image: url('https://picsum.photos/seed/pic5/1920/1080');
-  }
-}
+    <!-- Email Verification Info Section -->
+    <div id="verify-section" class="section hidden">
+      <h2 id="verify-title"></h2>
+      <p id="verify-info"></p>
+      <button id="resend-verification-btn" class="btn"></button>
+      <p class="info-msg" id="resend-info"></p>
+    </div>
 
-.container {
-  background: rgba(0,0,0,0.7);
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 100%;
-  box-sizing: border-box;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-}
+    <!-- Data Management Section -->
+    <div id="data-section" class="section hidden">
+      <h2 id="data-title"></h2>
+      <form id="data-form" class="data-form">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="text" id="message" placeholder="Message" required />
+        <button type="submit" class="btn" id="data-add-btn"></button>
+      </form>
 
-.lang-select {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
+      <div class="filter-container">
+        <input type="text" id="search-input" placeholder="Search..." />
+        <select id="sort-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="az">A-Z</option>
+          <option value="za">Z-A</option>
+        </select>
+        <button id="apply-filters-btn" class="btn"></button>
+      </div>
 
-h1 {
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
-  letter-spacing: 1px;
-}
+      <div id="data-list" class="data-list"></div>
+      <p class="info-msg" id="data-info"></p>
+    </div>
 
-h2 {
-  margin-bottom: 1rem;
-  font-size: 1.4rem;
-}
+    <!-- Profile Section -->
+    <div id="profile-section" class="section hidden">
+      <h2 id="profile-title"></h2>
+      <input type="text" id="profile-name" placeholder="Full Name" />
+      <input type="text" id="profile-photo" placeholder="Photo URL" />
+      <button id="profile-save-btn" class="btn"></button>
+      <p class="info-msg" id="profile-info"></p>
+    </div>
 
-.section {
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  opacity: 0;
-  transform: translateY(20px);
-  display: none;
-}
+    <!-- Admin Section -->
+    <div id="admin-section" class="section hidden">
+      <h2 id="admin-title"></h2>
 
-.section.visible {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
+      <div class="admin-tabs">
+        <button class="admin-tab-btn" data-tab="user-management" id="admin-users-tab"></button>
+        <button class="admin-tab-btn" data-tab="stats" id="admin-stats-tab"></button>
+      </div>
 
-.auth-forms {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
+      <div id="admin-content">
+        <!-- User Management -->
+        <div id="user-management" class="admin-tab-content hidden">
+          <h3 id="user-management-title"></h3>
+          <div id="user-list"></div>
+          <p class="info-msg" id="user-info"></p>
+        </div>
 
-.auth-form {
-  margin: 1rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+        <!-- Stats & Charts -->
+        <div id="stats" class="admin-tab-content hidden">
+          <h3 id="stats-title"></h3>
+          <canvas id="userChart" width="300" height="200"></canvas>
+          <canvas id="messageChart" width="300" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
 
-.auth-form input {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: none;
-  border-radius: 5px;
-  width: 90%;
-}
-
-.data-form, .filter-container, #profile-section {
-  margin-bottom: 1rem;
-}
-
-.data-form input, #profile-section input, #reset-section input {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: none;
-  border-radius: 5px;
-  width: 90%;
-}
-
-.filter-container {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.data-list {
-  margin: 1rem 0;
-  text-align: left;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.data-list .data-item {
-  background: rgba(255,255,255,0.1);
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border-radius: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.data-list .data-item span {
-  word-break: break-all;
-}
-
-.data-list .data-item button.delete-btn {
-  background: #f25454;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  color: #fff;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.8rem;
-}
-
-.data-list .data-item button.delete-btn:hover {
-  background: #c94343;
-}
-
-.btn {
-  margin-top: 0.5rem;
-  padding: 0.6rem 1rem;
-  background: #5564f2;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-weight: bold;
-  color: #fff;
-}
-
-.btn:hover {
-  background: #4548c9;
-}
-
-.logout-btn {
-  margin-top: 1.5rem;
-  background: #f25454;
-}
-
-.logout-btn:hover {
-  background: #c94343;
-}
-
-.info-msg {
-  min-height: 20px;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #ffdf5d;
-}
-
-.nav {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  justify-content: center;
-}
-
-.nav-btn {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: #fff;
-  padding: 0.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.nav-btn:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.forgot-pw {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.forgot-pw a {
-  color: #ffdf5d;
-  text-decoration: none;
-}
-
-.forgot-pw a:hover {
-  text-decoration: underline;
-}
-
-.admin-only {
-  display: none;
-}
-
-.admin-tabs {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.admin-tab-btn {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: #fff;
-  padding: 0.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.admin-tab-btn:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.admin-tab-content {
-  display: none;
-}
-
-.admin-tab-content.hidden {
-  display: none;
-}
-
-.admin-tab-content.visible {
-  display: block;
-  text-align: left;
-}
-
-#user-list {
-  max-height: 200px;
-  overflow-y: auto;
-  margin: 1rem 0;
-}
-
-#user-list .user-item {
-  background: rgba(255,255,255,0.1);
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border-radius: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#user-list .user-item button {
-  background: #5564f2;
-  border: none;
-  border-radius: 5px;
-  padding: 0.3rem 0.6rem;
-  color: #fff;
-  cursor: pointer;
-}
-
-#user-list .user-item button:hover {
-  background: #4548c9;
-}
-
-@media (max-width: 600px) {
-  .container {
-    max-width: 90%;
-  }
-}
+  <!-- Proje kodlarımız -->
+  <script type="module" src="index.js"></script>
+</body>
+</html>
