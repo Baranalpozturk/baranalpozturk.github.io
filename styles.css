@@ -1,9 +1,8 @@
- /* KÖK ELEMENTLER */
+/* KÖK ELEMENTLER */
 html, body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  /* Eğer tam sayfa scroll istiyorsanız: */
   min-height: 100vh;
   overflow-x: hidden; 
   overflow-y: auto;
@@ -297,6 +296,18 @@ h2 {
 }
 #user-list .user-item button:hover {
   background: #4548c9;
+}
+
+/* Word Analysis bölümü ek stil */
+.analysis-charts {
+  margin-top: 1rem;
+}
+.analysis-charts canvas {
+  margin: 1rem auto;
+  max-width: 100%;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  padding: 0.5rem;
 }
 
 /* Mobil uyum */
