@@ -20,9 +20,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 
 // == Firebase Config ==
-// Burayı kendi Firebase bilgilerinle güncelledim (baranalp-6ebb3 projesi).
 const firebaseConfig = {
-  apiKey: "AIzaSyB5vAeN2_RpXftWn69gDFUCdytSoEYFkAY",
+  // Burayı kendi Firebase projenizin config bilgileriyle güncelleyin
+  apiKey: "AIzaSyB5vAeN2_...",
   authDomain: "baranalp-6ebb3.firebaseapp.com",
   databaseURL: "https://baranalp-6ebb3-default-rtdb.firebaseio.com",
   projectId: "baranalp-6ebb3",
@@ -424,7 +424,7 @@ registerBtn.addEventListener("click", () => {
           set(adminRef, userId);
           registerInfo.textContent = "Registration successful! First user set as admin.";
         } else {
-          // Devam edenler normal kullanıcı
+          // Diğer üyeler normal
           set(ref(database, `users/${userId}`), { email, admin: false });
           registerInfo.textContent = "Registration successful! You are a normal user.";
         }
