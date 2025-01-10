@@ -1,3 +1,4 @@
+// == Firebase Config (baranalp-6ebb3) ==
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import {
   getAuth,
@@ -19,12 +20,7 @@ import {
   update
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 
-// Chart.js kullanan fonksiyonlar için (CDN'den yüklüyorsanız, global Chart değişkeni de olabilir)
- // => Aşağıda kod içinde 'new Chart(...)' şeklinde kullanacağız. 
- // => Bu import, eğer "import Chart from..." formatında isterseniz ekleyin. 
- // import { Chart } from "https://cdn.jsdelivr.net/npm/chart.js"; 
-
-// == Firebase Config (baranalp-6ebb3) ==
+// == Firebase Config ==
 const firebaseConfig = {
   apiKey: "AIzaSyB5vAeN2_RpXftWn69gDFUCdytSoEYFkAY",
   authDomain: "baranalp-6ebb3.firebaseapp.com",
@@ -41,14 +37,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// == UI Elements (orijinal kodlar) ==
+// == UI Elements ==
 const authSection = document.getElementById("auth-section");
 const dataSection = document.getElementById("data-section");
 const profileSection = document.getElementById("profile-section");
 const adminSection = document.getElementById("admin-section");
 const resetSection = document.getElementById("reset-section");
 const verifySection = document.getElementById("verify-section");
-
 // YENİ: Word Analysis Section
 const analysisSection = document.getElementById("analysis-section");
 
@@ -75,7 +70,6 @@ const resendInfo = document.getElementById("resend-info");
 const verifyInfo = document.getElementById("verify-info");
 const userInfo = document.getElementById("user-info");
 
-// Data form ve filtre
 const dataForm = document.getElementById("data-form");
 const dataList = document.getElementById("data-list");
 const searchInput = document.getElementById("search-input");
@@ -101,15 +95,12 @@ const userShareChartCanvas = document.getElementById("userShareChart");
 const chartInfo = document.getElementById("chart-info");
 const userShareContainer = document.getElementById("user-share-container");
 
-// Navigation Buttons
+// == Navigation Buttons ==
 const navDataBtn = document.getElementById("nav-data");
 const navProfileBtn = document.getElementById("nav-profile");
 const navAdminBtn = document.getElementById("nav-admin");
 // YENİ
 const navAnalysisBtn = document.getElementById("nav-analysis");
-
-// i18n 
-const languageSelector = document.getElementById("language-selector");
 
 // == i18n (çok dilli destek) ==
 const translations = {
@@ -175,6 +166,7 @@ function applyTranslations(lang) {
   }
 }
 
+const languageSelector = document.getElementById("language-selector");
 languageSelector.addEventListener("change", () => {
   applyTranslations(languageSelector.value);
 });
@@ -201,7 +193,7 @@ function showSection(section) {
     adminSection,
     resetSection,
     verifySection,
-    analysisSection  // YENİ
+    analysisSection // YENİ
   ];
   sections.forEach(sec => {
     sec.classList.remove("visible");
@@ -220,7 +212,7 @@ function clearMessages() {
   resendInfo.textContent = "";
   verifyInfo.textContent = "";
   userInfo.textContent = "";
-  // Word Analysis alanında da istersek chartInfo vb. temizleyebiliriz
+  chartInfo.textContent = ""; // Word Analysis info msg
 }
 
 function setupNav(visible) {
@@ -238,7 +230,7 @@ function showAdminFeatures(show) {
   });
 }
 
-// Veri yükleme
+// == Data Yükleme (messages) ==
 function loadData() {
   onValue(ref(database, "messages"), (snapshot) => {
     if (!snapshot.exists()) {
@@ -267,22 +259,21 @@ function renderData() {
   const searchTerm = searchInput.value.toLowerCase();
   if (searchTerm) {
     filtered = filtered.filter(m =>
-      m.name?.toLowerCase().includes(searchTerm) ||
-      m.message?.toLowerCase().includes(searchTerm)
+      m.name.toLowerCase().includes(searchTerm) ||
+      m.message.toLowerCase().includes(searchTerm)
     );
   }
 
-  // Sıralama seçimi
+  // Sıralama
   const sortType = sortSelect.value;
   if (sortType === "newest") {
-    // b.id.localeCompare(a.id) => ID'yi string olarak karşılaştırıyor
     filtered.sort((a, b) => b.id.localeCompare(a.id));
   } else if (sortType === "oldest") {
     filtered.sort((a, b) => a.id.localeCompare(b.id));
   } else if (sortType === "az") {
-    filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortType === "za") {
-    filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+    filtered.sort((a, b) => b.name.localeCompare(a.name));
   }
 
   if (filtered.length === 0) {
@@ -305,7 +296,6 @@ function renderData() {
   });
 }
 
-// Silme işlevi (admin)
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("delete-btn")) {
     const dataId = event.target.dataset.id;
@@ -327,7 +317,7 @@ applyFiltersBtn.addEventListener("click", () => {
   renderData();
 });
 
-// Kullanıcı Profil Yükleme
+// Profil Yükleme
 function loadUserProfile(uid) {
   get(ref(database, `users/${uid}`)).then(snapshot => {
     if (snapshot.exists()) {
@@ -341,7 +331,7 @@ function loadUserProfile(uid) {
   });
 }
 
-// Tüm kullanıcıları yükle (Admin)
+// Tüm kullanıcılar (Admin)
 function loadAllUsers() {
   get(ref(database, "users")).then(snapshot => {
     allUsers = [];
@@ -383,7 +373,7 @@ function toggleAdmin(uid, makeAdmin) {
     });
 }
 
-// İstatistik Chart (Admin Panel)
+// Admin Paneli - İstatistik Charts
 function renderCharts() {
   const totalUsers = allUsers.length;
   const adminCount = allUsers.filter(u => u.admin).length;
@@ -441,12 +431,12 @@ registerBtn.addEventListener("click", () => {
 
       get(adminRef).then((snapshot) => {
         if (!snapshot.exists()) {
-          // Eğer admin node'u yoksa, ilk kullanıcı admin olsun
+          // İlk kullanıcı admin
           set(ref(database, `users/${userId}`), { email, admin: true });
           set(adminRef, userId);
           registerInfo.textContent = "Registration successful! First user set as admin.";
         } else {
-          // Aksi halde normal kullanıcı
+          // Diğer kullanıcılar normal
           set(ref(database, `users/${userId}`), { email, admin: false });
           registerInfo.textContent = "Registration successful! You are a normal user.";
         }
@@ -490,7 +480,7 @@ logoutBtn.addEventListener("click", () => {
     setupNav(false);
     clearMessages();
     showSection(authSection);
-    registerForm.style.display = "flex"; // Tekrar görünsün
+    registerForm.style.display = "flex";
   });
 });
 
@@ -577,7 +567,7 @@ dataForm.addEventListener("submit", (e) => {
       loadAllUsers();
       renderCharts();
     }
-    // YENİ: Word Analysis sekmesi açıldığında, grafikleri yükle
+    // YENİ: Word Analysis sekmesine girince:
     if (sectionId === "analysis-section") {
       renderWordAnalysis();
     }
@@ -603,9 +593,7 @@ dataForm.addEventListener("submit", (e) => {
 onAuthStateChanged(auth, (user) => {
   clearMessages();
   if (user) {
-    // Kullanıcı girişi varsa register formunu gizle
     registerForm.style.display = "none";
-
     if (!user.emailVerified) {
       showSection(verifySection);
       return;
@@ -631,7 +619,6 @@ onAuthStateChanged(auth, (user) => {
       }
     });
   } else {
-    // Kullanıcı yoksa register formu görünür
     registerForm.style.display = "flex";
     currentUserId = null;
     isAdmin = false;
@@ -641,35 +628,28 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Sayfa ilk açıldığında Auth ekranını göster
+// İlk açılışta
 showSection(authSection);
 
-/****************************************************
+/***********************************************
  * YENİ: Word Analysis (Kelime Dağılımı) KODLARI
- ****************************************************/
-
-/**
- * Word Analysis Sekmesi açıldığında çağrılacak fonksiyon.
- * Mevcut allMessages listesinden, searchInput.value ile filtre uygulayıp
- * Chart.js ile pasta grafiği oluşturacağız.
- */
+ ***********************************************/
 let wordChart = null;
 let userShareChart = null;
 
 function renderWordAnalysis() {
-  // 1) Filtreli mesajları al
+  // Filtre uygulanmış mesajları al
   const searchTerm = searchInput.value.trim().toLowerCase();
   let filtered = [...allMessages];
   if (searchTerm) {
     filtered = filtered.filter(m => 
-      m.name?.toLowerCase().includes(searchTerm) ||
-      m.message?.toLowerCase().includes(searchTerm)
+      m.name.toLowerCase().includes(searchTerm) ||
+      m.message.toLowerCase().includes(searchTerm)
     );
   }
 
-  // Eğer filtre sonucu boşsa
+  // Eğer filtre sonucu yoksa grafikleri yok et
   if (filtered.length === 0) {
-    // Grafikleri sıfırla/gizle
     if (wordChart) wordChart.destroy();
     if (userShareChart) userShareChart.destroy();
     chartInfo.textContent = "Gösterilecek veri yok.";
@@ -677,7 +657,7 @@ function renderWordAnalysis() {
     return;
   }
 
-  // 2) Kelimeleri ayrıştır ve say
+  // Kelimeleri sayalım
   const wordCountMap = {};
   filtered.forEach(item => {
     const words = item.message.toLowerCase().split(/\s+/);
@@ -687,32 +667,25 @@ function renderWordAnalysis() {
     });
   });
 
-  // 3) Mevcut wordChart varsa destroy et
-  if (wordChart) {
-    wordChart.destroy();
-  }
-  if (userShareChart) {
-    userShareChart.destroy();
-  }
+  // Mevcut chartları sıfırla
+  if (wordChart) wordChart.destroy();
+  if (userShareChart) userShareChart.destroy();
 
-  // 4) Sıklık tablosu (kelime: adet)
+  // wordChart oluştur
   const wordEntries = Object.entries(wordCountMap).sort((a,b) => b[1] - a[1]);
   const labels = wordEntries.map(e => e[0]);
   const data = wordEntries.map(e => e[1]);
 
-  // 5) Chart.js ile kelime dağılımı
   const ctx = wordChartCanvas.getContext("2d");
   wordChart = new Chart(ctx, {
     type: "pie",
     data: {
       labels: labels,
-      datasets: [
-        {
-          label: "Kelime Dağılımı",
-          data: data,
-          backgroundColor: generateColorArray(data.length)
-        }
-      ]
+      datasets: [{
+        label: "Kelime Dağılımı",
+        data: data,
+        backgroundColor: generateColorArray(data.length)
+      }]
     },
     options: {
       plugins: {
@@ -724,10 +697,9 @@ function renderWordAnalysis() {
     }
   });
 
-  // 6) Tek kullanıcı mı?
-  const uniqueNames = Array.from(new Set(filtered.map(m => m.name?.toLowerCase())));
+  // Tek kullanıcı mı var?
+  const uniqueNames = Array.from(new Set(filtered.map(m => m.name.toLowerCase())));
   if (uniqueNames.length === 1) {
-    // Kullanıcı payı:
     const userName = uniqueNames[0];
     const userMsgCount = filtered.length;
     const totalMsgCount = allMessages.length;
@@ -742,12 +714,10 @@ function renderWordAnalysis() {
           `${userName} (${userMsgCount} mesaj)`,
           `Diğer (${totalMsgCount - userMsgCount} mesaj)`
         ],
-        datasets: [
-          {
-            data: [userMsgCount, totalMsgCount - userMsgCount],
-            backgroundColor: ["#5564f2", "#f25454"]
-          }
-        ]
+        datasets: [{
+          data: [userMsgCount, totalMsgCount - userMsgCount],
+          backgroundColor: ["#5564f2", "#f25454"]
+        }]
       },
       options: {
         plugins: {
@@ -762,11 +732,11 @@ function renderWordAnalysis() {
     userShareContainer.style.display = "none";
   }
 
-  // 7) Toplam kelime sayısı
-  chartInfo.textContent = `Toplam Kelime Sayısı: ${data.reduce((a,b) => a+b, 0)}`;
+  // Toplam kelime sayısı
+  const totalWords = data.reduce((a,b) => a+b, 0);
+  chartInfo.textContent = `Toplam Kelime Sayısı: ${totalWords}`;
 }
 
-// Rastgele renk üretme fonksiyonu
 function generateColorArray(count) {
   const colors = [];
   for (let i = 0; i < count; i++) {
