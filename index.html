@@ -12,10 +12,7 @@
 <body>
   <div class="overlay"></div>
   <div class="container">
-    <!-- Uygulama Başlık -->
     <h1 id="app-title">Veri Analizi Uygulaması</h1>
-    
-    <!-- Dil Seçimi (i18n) -->
     <div class="lang-select">
       <select id="language-selector">
         <option value="en">English</option>
@@ -23,17 +20,17 @@
       </select>
     </div>
 
-    <!-- Navigation Bar -->
+    <!-- Navigation -->
     <nav class="nav hidden" id="nav-bar">
       <button class="nav-btn" data-section="data-section" id="nav-data"></button>
       <button class="nav-btn" data-section="profile-section" id="nav-profile"></button>
       <button class="nav-btn admin-only" data-section="admin-section" id="nav-admin"></button>
-      <!-- Yeni Word Analysis sekmesi -->
+      <!-- YENİ: Word Analysis sekmesi -->
       <button class="nav-btn" data-section="analysis-section" id="nav-analysis">Word Analysis</button>
       <button id="logout-btn" class="btn logout-btn"></button>
     </nav>
 
-    <!-- Authentication Section (Register & Login) -->
+    <!-- Authentication Section -->
     <div id="auth-section" class="section visible">
       <h2 id="auth-title"></h2>
       <div class="auth-forms">
@@ -138,20 +135,13 @@
     <!-- YENİ: Word Analysis Section -->
     <div id="analysis-section" class="section hidden">
       <h2>Word Analysis</h2>
-      <!-- Açıklama veya ek filtre: -->
-      <p>Bu bölümde mesajlar içindeki kelimelerin sıklığını pasta grafiği şeklinde görebilirsiniz.</p>
+      <p>Bu bölümde mesajlar içindeki kelimelerin sıklığını pasta grafiği olarak görebilirsiniz.</p>
 
-      <!-- İsteğe bağlı, tekrar bir filtre alanı:
-           (Ancak mevcut searchInput zaten global bir filtre yapıyor. 
-            Dilerseniz ek girdi koyabilirsiniz.) 
-      -->
       <div class="analysis-charts">
-        <!-- Kelime Frekans Analizi Grafiği -->
         <h3>Kullanılan Kelimelerin Dağılımı</h3>
         <canvas id="wordChart" width="300" height="200"></canvas>
         <p class="info-msg" id="chart-info"></p>
 
-        <!-- Tek kullanıcıya indirgenirse, pay grafiği -->
         <h3>Kullanıcının Toplamdaki Payı</h3>
         <div id="user-share-container" style="display:none;">
           <canvas id="userShareChart" width="300" height="200"></canvas>
