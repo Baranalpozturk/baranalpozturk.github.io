@@ -3,9 +3,8 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  /* Eğer tam sayfa scroll istiyorsanız: */
   min-height: 100vh;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
@@ -26,11 +25,10 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: -1;
 }
 
-/* Arka plan animasyonu (body::after) */
 body::after {
   content: "";
   position: fixed;
@@ -55,10 +53,10 @@ body::after {
 }
 
 .container {
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   padding: 2rem;
   border-radius: 10px;
-  max-width: 500px;
+  max-width: 600px; /* Genişliği artırdım, grafikler için */
   width: 100%;
   box-sizing: border-box;
   max-height: 90vh;
@@ -150,7 +148,7 @@ h2 {
   overflow-y: auto;
 }
 .data-list .data-item {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   margin: 0.5rem 0;
   padding: 0.5rem;
   border-radius: 5px;
@@ -215,7 +213,7 @@ h2 {
   justify-content: center;
 }
 .nav-btn {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #fff;
   padding: 0.5rem;
@@ -224,7 +222,7 @@ h2 {
   white-space: nowrap;
 }
 .nav-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Şifremi Unuttum linki */
@@ -251,7 +249,7 @@ h2 {
   margin-bottom: 1rem;
 }
 .admin-tab-btn {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #fff;
   padding: 0.5rem;
@@ -259,7 +257,7 @@ h2 {
   cursor: pointer;
 }
 .admin-tab-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .admin-tab-content {
@@ -279,7 +277,7 @@ h2 {
   margin: 1rem 0;
 }
 #user-list .user-item {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   margin: 0.5rem 0;
   padding: 0.5rem;
   border-radius: 5px;
