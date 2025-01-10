@@ -1,4 +1,4 @@
- import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -19,6 +19,11 @@ import {
   update
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 
+// Chart.js kullanan fonksiyonlar için (CDN'den yüklüyorsanız, global Chart değişkeni de olabilir)
+ // => Aşağıda kod içinde 'new Chart(...)' şeklinde kullanacağız. 
+ // => Bu import, eğer "import Chart from..." formatında isterseniz ekleyin. 
+ // import { Chart } from "https://cdn.jsdelivr.net/npm/chart.js"; 
+
 // == Firebase Config (baranalp-6ebb3) ==
 const firebaseConfig = {
   apiKey: "AIzaSyB5vAeN2_RpXftWn69gDFUCdytSoEYFkAY",
@@ -36,13 +41,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// == UI Elements ==
+// == UI Elements (orijinal kodlar) ==
 const authSection = document.getElementById("auth-section");
 const dataSection = document.getElementById("data-section");
 const profileSection = document.getElementById("profile-section");
 const adminSection = document.getElementById("admin-section");
 const resetSection = document.getElementById("reset-section");
 const verifySection = document.getElementById("verify-section");
+
+// YENİ: Word Analysis Section
+const analysisSection = document.getElementById("analysis-section");
 
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
@@ -67,6 +75,7 @@ const resendInfo = document.getElementById("resend-info");
 const verifyInfo = document.getElementById("verify-info");
 const userInfo = document.getElementById("user-info");
 
+// Data form ve filtre
 const dataForm = document.getElementById("data-form");
 const dataList = document.getElementById("data-list");
 const searchInput = document.getElementById("search-input");
@@ -86,10 +95,21 @@ const statsDiv = document.getElementById("stats");
 const userChartCanvas = document.getElementById("userChart");
 const messageChartCanvas = document.getElementById("messageChart");
 
-// == Navigation Buttons ==
+// Word Analysis canvas referansları
+const wordChartCanvas = document.getElementById("wordChart");
+const userShareChartCanvas = document.getElementById("userShareChart");
+const chartInfo = document.getElementById("chart-info");
+const userShareContainer = document.getElementById("user-share-container");
+
+// Navigation Buttons
 const navDataBtn = document.getElementById("nav-data");
 const navProfileBtn = document.getElementById("nav-profile");
 const navAdminBtn = document.getElementById("nav-admin");
+// YENİ
+const navAnalysisBtn = document.getElementById("nav-analysis");
+
+// i18n 
+const languageSelector = document.getElementById("language-selector");
 
 // == i18n (çok dilli destek) ==
 const translations = {
@@ -155,7 +175,6 @@ function applyTranslations(lang) {
   }
 }
 
-const languageSelector = document.getElementById("language-selector");
 languageSelector.addEventListener("change", () => {
   applyTranslations(languageSelector.value);
 });
@@ -181,7 +200,8 @@ function showSection(section) {
     profileSection,
     adminSection,
     resetSection,
-    verifySection
+    verifySection,
+    analysisSection  // YENİ
   ];
   sections.forEach(sec => {
     sec.classList.remove("visible");
@@ -200,6 +220,7 @@ function clearMessages() {
   resendInfo.textContent = "";
   verifyInfo.textContent = "";
   userInfo.textContent = "";
+  // Word Analysis alanında da istersek chartInfo vb. temizleyebiliriz
 }
 
 function setupNav(visible) {
@@ -246,20 +267,22 @@ function renderData() {
   const searchTerm = searchInput.value.toLowerCase();
   if (searchTerm) {
     filtered = filtered.filter(m =>
-      m.name.toLowerCase().includes(searchTerm) ||
-      m.message.toLowerCase().includes(searchTerm)
+      m.name?.toLowerCase().includes(searchTerm) ||
+      m.message?.toLowerCase().includes(searchTerm)
     );
   }
 
+  // Sıralama seçimi
   const sortType = sortSelect.value;
   if (sortType === "newest") {
+    // b.id.localeCompare(a.id) => ID'yi string olarak karşılaştırıyor
     filtered.sort((a, b) => b.id.localeCompare(a.id));
   } else if (sortType === "oldest") {
     filtered.sort((a, b) => a.id.localeCompare(b.id));
   } else if (sortType === "az") {
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
+    filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   } else if (sortType === "za") {
-    filtered.sort((a, b) => b.name.localeCompare(a.name));
+    filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
   }
 
   if (filtered.length === 0) {
@@ -270,7 +293,7 @@ function renderData() {
   filtered.forEach(item => {
     const div = document.createElement("div");
     div.className = "data-item";
-    div.innerHTML = <span><strong>${item.name}</strong>: ${item.message}</span>;
+    div.innerHTML = `<span><strong>${item.name}</strong>: ${item.message}</span>`;
     if (isAdmin) {
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
@@ -282,16 +305,17 @@ function renderData() {
   });
 }
 
+// Silme işlevi (admin)
 document.addEventListener("click", (event) => {
   if (event.target.classList.contains("delete-btn")) {
     const dataId = event.target.dataset.id;
     if (isAdmin) {
-      remove(ref(database, messages/${dataId}))
+      remove(ref(database, `messages/${dataId}`))
         .then(() => {
           dataInfo.textContent = "Data deleted!";
         })
         .catch((error) => {
-          dataInfo.textContent = Error deleting data: ${error.message};
+          dataInfo.textContent = `Error deleting data: ${error.message}`;
         });
     } else {
       dataInfo.textContent = "Only admin users can delete data!";
@@ -305,7 +329,7 @@ applyFiltersBtn.addEventListener("click", () => {
 
 // Kullanıcı Profil Yükleme
 function loadUserProfile(uid) {
-  get(ref(database, users/${uid})).then(snapshot => {
+  get(ref(database, `users/${uid}`)).then(snapshot => {
     if (snapshot.exists()) {
       const userData = snapshot.val();
       profileNameInput.value = userData.fullName || "";
@@ -340,9 +364,7 @@ function renderUserList() {
   allUsers.forEach(user => {
     const div = document.createElement("div");
     div.className = "user-item";
-    div.innerHTML = 
-      <span>${user.email} ${user.admin ? "(admin)" : ""}</span>
-    ;
+    div.innerHTML = `<span>${user.email} ${user.admin ? "(admin)" : ""}</span>`;
     if (currentUserId !== user.uid) {
       const toggleAdminBtn = document.createElement("button");
       toggleAdminBtn.textContent = user.admin ? "Remove Admin" : "Make Admin";
@@ -354,14 +376,14 @@ function renderUserList() {
 }
 
 function toggleAdmin(uid, makeAdmin) {
-  update(ref(database, users/${uid}), { admin: makeAdmin })
+  update(ref(database, `users/${uid}`), { admin: makeAdmin })
     .then(() => {
       userInfo.textContent = "User updated successfully.";
       loadAllUsers();
     });
 }
 
-// İstatistik Chart
+// İstatistik Chart (Admin Panel)
 function renderCharts() {
   const totalUsers = allUsers.length;
   const adminCount = allUsers.filter(u => u.admin).length;
@@ -420,12 +442,12 @@ registerBtn.addEventListener("click", () => {
       get(adminRef).then((snapshot) => {
         if (!snapshot.exists()) {
           // Eğer admin node'u yoksa, ilk kullanıcı admin olsun
-          set(ref(database, users/${userId}), { email, admin: true });
+          set(ref(database, `users/${userId}`), { email, admin: true });
           set(adminRef, userId);
           registerInfo.textContent = "Registration successful! First user set as admin.";
         } else {
           // Aksi halde normal kullanıcı
-          set(ref(database, users/${userId}), { email, admin: false });
+          set(ref(database, `users/${userId}`), { email, admin: false });
           registerInfo.textContent = "Registration successful! You are a normal user.";
         }
         sendEmailVerification(auth.currentUser).then(() => {
@@ -436,7 +458,7 @@ registerBtn.addEventListener("click", () => {
       });
     })
     .catch((error) => {
-      registerInfo.textContent = Error: ${error.message};
+      registerInfo.textContent = `Error: ${error.message}`;
     });
 });
 
@@ -456,7 +478,7 @@ loginBtn.addEventListener("click", () => {
 
   signInWithEmailAndPassword(auth, email, password)
     .catch((error) => {
-      loginInfo.textContent = Error: ${error.message};
+      loginInfo.textContent = `Error: ${error.message}`;
     });
 });
 
@@ -468,8 +490,7 @@ logoutBtn.addEventListener("click", () => {
     setupNav(false);
     clearMessages();
     showSection(authSection);
-    // Kullanıcı çıkınca register formu tekrar görünür olsun
-    registerForm.style.display = "flex";
+    registerForm.style.display = "flex"; // Tekrar görünsün
   });
 });
 
@@ -490,7 +511,7 @@ resetBtn.addEventListener("click", () => {
       resetInfo.textContent = "Password reset email sent!";
     })
     .catch(error => {
-      resetInfo.textContent = Error: ${error.message};
+      resetInfo.textContent = `Error: ${error.message}`;
     });
 });
 
@@ -501,7 +522,7 @@ resendVerificationBtn.addEventListener("click", () => {
         resendInfo.textContent = "Verification email sent again!";
       })
       .catch(error => {
-        resendInfo.textContent = Error: ${error.message};
+        resendInfo.textContent = `Error: ${error.message}`;
       });
   }
 });
@@ -509,12 +530,12 @@ resendVerificationBtn.addEventListener("click", () => {
 profileSaveBtn.addEventListener("click", () => {
   const fullName = profileNameInput.value.trim();
   const photoURL = profilePhotoInput.value.trim();
-  update(ref(database, users/${currentUserId}), { fullName, photoURL })
+  update(ref(database, `users/${currentUserId}`), { fullName, photoURL })
     .then(() => {
       profileInfo.textContent = "Profile updated successfully!";
     })
     .catch(error => {
-      profileInfo.textContent = Error: ${error.message};
+      profileInfo.textContent = `Error: ${error.message}`;
     });
 });
 
@@ -538,12 +559,12 @@ dataForm.addEventListener("submit", (e) => {
       messageInput.value = "";
     })
     .catch((error) => {
-      dataInfo.textContent = Error adding data: ${error.message};
+      dataInfo.textContent = `Error adding data: ${error.message}`;
     });
 });
 
 // Navigasyon butonları
-[navDataBtn, navProfileBtn, navAdminBtn].forEach(btn => {
+[navDataBtn, navProfileBtn, navAdminBtn, navAnalysisBtn].forEach(btn => {
   btn.addEventListener("click", () => {
     const sectionId = btn.dataset.section;
     if (sectionId === "admin-section" && !isAdmin) {
@@ -555,6 +576,10 @@ dataForm.addEventListener("submit", (e) => {
     if (sectionId === "admin-section" && isAdmin) {
       loadAllUsers();
       renderCharts();
+    }
+    // YENİ: Word Analysis sekmesi açıldığında, grafikleri yükle
+    if (sectionId === "analysis-section") {
+      renderWordAnalysis();
     }
   });
 });
@@ -586,7 +611,7 @@ onAuthStateChanged(auth, (user) => {
       return;
     }
     currentUserId = user.uid;
-    get(ref(database, users/${currentUserId})).then(snapshot => {
+    get(ref(database, `users/${currentUserId}`)).then(snapshot => {
       if (snapshot.exists()) {
         isAdmin = snapshot.val().admin;
         showAdminFeatures(isAdmin);
@@ -618,3 +643,137 @@ onAuthStateChanged(auth, (user) => {
 
 // Sayfa ilk açıldığında Auth ekranını göster
 showSection(authSection);
+
+/****************************************************
+ * YENİ: Word Analysis (Kelime Dağılımı) KODLARI
+ ****************************************************/
+
+/**
+ * Word Analysis Sekmesi açıldığında çağrılacak fonksiyon.
+ * Mevcut allMessages listesinden, searchInput.value ile filtre uygulayıp
+ * Chart.js ile pasta grafiği oluşturacağız.
+ */
+let wordChart = null;
+let userShareChart = null;
+
+function renderWordAnalysis() {
+  // 1) Filtreli mesajları al
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  let filtered = [...allMessages];
+  if (searchTerm) {
+    filtered = filtered.filter(m => 
+      m.name?.toLowerCase().includes(searchTerm) ||
+      m.message?.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  // Eğer filtre sonucu boşsa
+  if (filtered.length === 0) {
+    // Grafikleri sıfırla/gizle
+    if (wordChart) wordChart.destroy();
+    if (userShareChart) userShareChart.destroy();
+    chartInfo.textContent = "Gösterilecek veri yok.";
+    userShareContainer.style.display = "none";
+    return;
+  }
+
+  // 2) Kelimeleri ayrıştır ve say
+  const wordCountMap = {};
+  filtered.forEach(item => {
+    const words = item.message.toLowerCase().split(/\s+/);
+    words.forEach(w => {
+      if (!wordCountMap[w]) wordCountMap[w] = 0;
+      wordCountMap[w]++;
+    });
+  });
+
+  // 3) Mevcut wordChart varsa destroy et
+  if (wordChart) {
+    wordChart.destroy();
+  }
+  if (userShareChart) {
+    userShareChart.destroy();
+  }
+
+  // 4) Sıklık tablosu (kelime: adet)
+  const wordEntries = Object.entries(wordCountMap).sort((a,b) => b[1] - a[1]);
+  const labels = wordEntries.map(e => e[0]);
+  const data = wordEntries.map(e => e[1]);
+
+  // 5) Chart.js ile kelime dağılımı
+  const ctx = wordChartCanvas.getContext("2d");
+  wordChart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Kelime Dağılımı",
+          data: data,
+          backgroundColor: generateColorArray(data.length)
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: "Kullanılan Kelimelerin Dağılımı"
+        }
+      }
+    }
+  });
+
+  // 6) Tek kullanıcı mı?
+  const uniqueNames = Array.from(new Set(filtered.map(m => m.name?.toLowerCase())));
+  if (uniqueNames.length === 1) {
+    // Kullanıcı payı:
+    const userName = uniqueNames[0];
+    const userMsgCount = filtered.length;
+    const totalMsgCount = allMessages.length;
+    const userShare = (userMsgCount / totalMsgCount) * 100;
+
+    userShareContainer.style.display = "block";
+    const ctxShare = userShareChartCanvas.getContext("2d");
+    userShareChart = new Chart(ctxShare, {
+      type: "pie",
+      data: {
+        labels: [
+          `${userName} (${userMsgCount} mesaj)`,
+          `Diğer (${totalMsgCount - userMsgCount} mesaj)`
+        ],
+        datasets: [
+          {
+            data: [userMsgCount, totalMsgCount - userMsgCount],
+            backgroundColor: ["#5564f2", "#f25454"]
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: `Toplam Mesaj İçindeki Payı: %${userShare.toFixed(1)}`
+          }
+        }
+      }
+    });
+  } else {
+    userShareContainer.style.display = "none";
+  }
+
+  // 7) Toplam kelime sayısı
+  chartInfo.textContent = `Toplam Kelime Sayısı: ${data.reduce((a,b) => a+b, 0)}`;
+}
+
+// Rastgele renk üretme fonksiyonu
+function generateColorArray(count) {
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    const r = Math.floor(Math.random() * 200) + 55;
+    const g = Math.floor(Math.random() * 200) + 55;
+    const b = Math.floor(Math.random() * 200) + 55;
+    colors.push(`rgb(${r}, ${g}, ${b})`);
+  }
+  return colors;
+}
